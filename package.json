@@ -1,0 +1,20 @@
+{
+  "name": "teleicu",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    
+  
+  "start": "node Users\\munes\\Desktop\\teleicu\\teleicu_middleware-develop\\src\\public\\static\\js\\ws.js"
+
+
+  },
+ 
+
+
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}

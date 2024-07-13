@@ -1,0 +1,79 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AssetType {
+  ONVIF
+  HL7MONITOR
+  VENTILATOR
+}
+
+model Asset {
+  externalId  String       @id @default(uuid())
+  name        String
+  type        AssetType    @default(HL7MONITOR)
+  description String
+  ipAddress   String
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @default(now())
+  deleted     Boolean      @default(false)
+  accessKey   String?
+  username    String?
+  password    String?
+  port        Int?         @default(80)
+  DailyRound  DailyRound[]
+  Bed         Bed[]
+
+  @@index([externalId, ipAddress])
+}
+
+model Bed {
+  id               Int      @id @default(autoincrement())
+  name             String
+  externalId       String   @unique
+  monitorPreset    Preset?
+  camera           Asset?   @relation(fields: [cameraExternalId], references: [externalId], onDelete: SetNull, onUpdate: Cascade)
+  cameraExternalId String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @default(now())
+  deleted          Boolean  @default(false)
+}
+
+model Preset {
+  id    Int   @id @default(autoincrement())
+  x     Float
+  y     Float
+  zoom  Float @default(0.0)
+  bed   Bed   @relation(fields: [bedId], references: [id])
+  bedId Int   @unique
+}
+
+model DailyRound {
+  id              Int      @id @default(autoincrement())
+  assetExternalId String
+  status          String
+  data            String
+  response        String
+  time            DateTime @default(now())
+  asset           Asset    @relation(fields: [assetExternalId], references: [externalId], onDelete: Cascade, onUpdate: Cascade)
+}
+
+model VitalsStat {
+  id                    Int      @id @default(autoincrement())
+  imageId               String
+  vitalsFromObservation Json
+  vitalsFromImage       Json
+  gptDetails            Json
+  accuracy              Json
+  cumulativeAccuracy    Json
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+}
